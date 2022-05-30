@@ -1,0 +1,18 @@
+{
+  "env": {
+    "development": {
+      "presets": ["@babel/preset-env"],
+      "plugins": [
+        [
+          "babel-plugin-module-resolver",
+          {
+            "alias": {
+              "server": "./source/server",
+              "test": "./test"
+            }
+          }
+        ]
+      ]
+    }
+  }
+}
