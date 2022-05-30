@@ -215,12 +215,12 @@ setlocal fdn=20
 setlocal fen
 silent! normal! zE
 let &fdl = &fdl
-let s:l = 10 - ((0 * winheight(0) + 20) / 40)
+let s:l = 1 - ((0 * winheight(0) + 20) / 40)
 if s:l < 1 | let s:l = 1 | endif
 keepjumps exe s:l
 normal! zt
-keepjumps 10
-normal! 013|
+keepjumps 1
+normal! 03|
 tabnext
 edit source/client/Route/Post/EntityCollection/index.js
 argglobal
@@ -289,7 +289,6 @@ badd +89 source/client/store/post/index.js
 badd +12 source/client/index.js
 badd +9 source/client/style/index.scss
 badd +12 tsconfig.json
-badd +56 try.js
 badd +5 source/client/function/queryStringGet.js
 badd +2 source/server/router/post/entityCollectionGet/index.js
 badd +0 source/server/router/function/entityCollectionGet.js
