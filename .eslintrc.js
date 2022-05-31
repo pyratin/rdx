@@ -27,6 +27,10 @@ module.exports = {
     quotes: ['error', 'single', { avoidEscape: true }],
     semi: ['error', 'always'],
     'no-console': 'error',
-    '@typescript-eslint/no-unused-vars': ['error', { ignoreRestSiblings: true }]
+    '@typescript-eslint/no-unused-vars': [
+      'error',
+      { ignoreRestSiblings: true }
+    ],
+    'react/prop-types': 0
   }
 };

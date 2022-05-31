@@ -26,7 +26,7 @@ const Route = () => {
 
   const _render = () => {
     return (
-      <div className='d-flex justify-content-center'>
+      <div className='d-flex justify-content-center m-3'>
         <div
           className='w-100'
           css={css({

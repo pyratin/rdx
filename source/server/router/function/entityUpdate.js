@@ -22,7 +22,7 @@ export default (id, _input, collectionName, database) => {
     .then(() => {
       return {
         id,
-        ...input
+        changes: input
       };
     });
 };

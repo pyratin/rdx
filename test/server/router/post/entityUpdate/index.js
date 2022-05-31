@@ -18,6 +18,10 @@ describe(__data.text, () => {
     database = await databaseGet(false);
   });
 
+  after(() => {
+    return database.end();
+  });
+
   describe(__data.describe[0].text, () => {
     const _data = __data.describe[0];
 
@@ -110,13 +114,20 @@ describe(__data.text, () => {
               type: 'string',
               pattern: constant.PATTERN.ID
             },
-            ...schemaPropertyFromObjectGet(data.argument.body),
-            updatedAt: {
-              type: 'string',
-              format: 'date-time'
+            changes: {
+              type: 'object',
+              properties: {
+                ...schemaPropertyFromObjectGet(data.argument.body),
+                updatedAt: {
+                  type: 'string',
+                  format: 'date-time'
+                }
+              },
+              required: [...Object.keys(data.argument.body), 'updatedAt'],
+              additionalProperties: false
             }
           },
-          required: ['id', ...Object.keys(data.argument.body), 'updatedAt'],
+          required: ['id', 'changes'],
           additionalProperties: false
         };
 

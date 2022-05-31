@@ -30,6 +30,12 @@ const initialState = entityAdapter.getInitialState({
       error: null,
       input: { text: '' }
     },
+    entityUpdate: {
+      loading: false,
+      error: null,
+      id: null,
+      input: null
+    },
     entityCollectionGet: {
       loading: false,
       error: null
@@ -63,12 +69,48 @@ export const entityCreate = createAsyncThunk(
   }
 );
 
+export const entityUpdate = createAsyncThunk(
+  'post/update',
+  /** @type {(any) => any} */
+  ({ id, changes: body }) => {
+    return window
+      .fetch(`/post/${id}`, {
+        method: 'PUT',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(body)
+      })
+      .then((result) => {
+        return result.json();
+      });
+  }
+);
+
 export const slice = createSlice({
   name: 'post',
   initialState,
   reducers: {
     onEntityCreateInputHandle: (state, action) => {
       state.action.entityCreate.input[action.payload.key] =
+        action.payload.value;
+    },
+    onEntityUpdateTriggerHandle: (state, action) => {
+      state.action.entityUpdate.id = action.payload;
+
+      const { text } = entityAdapter
+        .getSelectors()
+        .selectById(state, action.payload);
+
+      state.action.entityUpdate.input = { text };
+    },
+    onEntityUpdateCancelHandle: (state) => {
+      state.action.entityUpdate.id = null;
+
+      state.action.entityUpdate.error = null;
+
+      state.action.entityUpdate.input = null;
+    },
+    onEntityUpdateInputHandle: (state, action) => {
+      state.action.entityUpdate.input[action.payload.key] =
         action.payload.value;
     }
   },
@@ -91,6 +133,18 @@ export const slice = createSlice({
                 initialState.action.entityCreate.input;
             })();
       })
+      .addCase(entityUpdate.pending, (state) => {
+        state.action.entityUpdate.loading = true;
+
+        state.action.entityUpdate.error = null;
+      })
+      .addCase(entityUpdate.fulfilled, (state, action) => {
+        state.action.entityUpdate.loading = false;
+
+        action.payload._error
+          ? (state.action.entityUpdate.error = action.payload)
+          : entityAdapter.updateOne(state, action.payload);
+      })
       .addCase(entityCollectionGet.pending, (state) => {
         state.action.entityCollectionGet.loading = true;
       })
@@ -104,16 +158,27 @@ export const slice = createSlice({
   }
 });
 
-export const { onEntityCreateInputHandle } = slice.actions;
+export const entitySelector = entityAdapter.getSelectors((state) => state.post);
+
+export const {
+  onEntityCreateInputHandle,
+  onEntityUpdateTriggerHandle,
+  onEntityUpdateCancelHandle,
+  onEntityUpdateInputHandle
+} = slice.actions;
 
 export default slice.reducer;
-
-export const entitySelector = entityAdapter.getSelectors((state) => state.post);
 
 export const entityCreateSelector = (state) => {
   const { loading, error, input } = state.post.action.entityCreate;
 
   return [loading, error, input];
+};
+
+export const entityUpdateSelector = (state) => {
+  const { loading, error, id, input } = state.post.action.entityUpdate;
+
+  return [loading, error, id, input];
 };
 
 export const entityCollectionGetSelector = (state) => {

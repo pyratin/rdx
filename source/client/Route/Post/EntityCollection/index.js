@@ -9,6 +9,9 @@ import {
   entityCollectionGetSelector
 } from 'client/store/post';
 import EntityCreate from 'client/Route/Post/component/EntityCreate';
+import EntityCollectionItem from 'client/Route/Post/component/EntityCollectionItem';
+import EntityCollectionEmpty from 'client/Route/component/EntityCollectionEmpty';
+import LoadingInline from 'client/Route/component/LoadingInline';
 
 const EntityCollection = () => {
   let limit = 1;
@@ -43,35 +46,61 @@ const EntityCollection = () => {
     );
   };
 
+  const entityCollectionEmptyRender = () => {
+    return !entityCollection.length && <EntityCollectionEmpty name='post' />;
+  };
+
   const entityCreateRender = () => {
     return <EntityCreate />;
   };
 
-  const entityRender = (entity) => {
+  const dividerRender = (py = 1, mt = 3) => {
+    return <div className={`py-${py} mt-${mt} border-top bg-light`}></div>;
+  };
+
+  const entityRender = (entity, index) => {
     return (
       <Fragment key={entity.id}>
-        <div>{entity.text}</div>
+        <EntityCollectionItem post={entity} />
+        {index < entityCollection.length - 1 && dividerRender(0)}
       </Fragment>
     );
   };
 
   const entityCollectionRender = () => {
-    return entityCollection.map((entity) => {
-      return entityRender(entity);
+    return entityCollection.map((entity, index) => {
+      return entityRender(entity, index);
     });
   };
 
   const reactInfiniteScrollerRender = () => {
     return (
       <ReactInfiniteScroller loadMore={onLoadMoreHandle} hasMore={hasMore}>
-        {entityCreateRender()}
         {entityCollectionRender()}
       </ReactInfiniteScroller>
     );
   };
 
+  const loadingRender = () => {
+    return (
+      loading && (
+        <div className='d-flex justify-content-center m-3'>
+          <LoadingInline />
+        </div>
+      )
+    );
+  };
+
   const _render = () => {
-    return <div>{reactInfiniteScrollerRender()}</div>;
+    return (
+      <div>
+        {entityCreateRender()}
+        {dividerRender()}
+        {entityCollectionEmptyRender()}
+        {reactInfiniteScrollerRender()}
+        {loadingRender()}
+      </div>
+    );
   };
 
   return <div className='EntityCollection'>{_render()}</div>;
