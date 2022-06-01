@@ -13,7 +13,7 @@ import EntityForm from 'client/Route/Post/component/EntityForm';
 const EntityUpdate = (props) => {
   const dispatch = /** @type {any} */ (useDispatch());
 
-  const [loading, error, , input] = useSelector((state) => {
+  const [loading, error, id, input] = useSelector((state) => {
     return entityUpdateSelector(state);
   });
 
@@ -24,7 +24,7 @@ const EntityUpdate = (props) => {
   const _entityUpdate = () => {
     return dispatch(
       entityUpdate({
-        id: props.post.id,
+        id,
         changes: input
       })
     ).then((result) => {

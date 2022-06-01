@@ -3,10 +3,15 @@
 import React from 'react';
 
 import EntityUpdateTrigger from 'client/Route/Post/component/EntityUpdateTrigger';
+import EntityDeleteTrigger from 'client/Route/Post/component/EntityDeleteTrigger';
 
 const Control = (props) => {
   const entityUpdateTriggerRender = () => {
     return <EntityUpdateTrigger post={props.post} />;
+  };
+
+  const entityDeleteTriggerRender = () => {
+    return <EntityDeleteTrigger post={props.post} />;
   };
 
   const dropdownRender = () => {
@@ -16,7 +21,13 @@ const Control = (props) => {
           <i className='fa fa-chevron-down fa-fw'></i>
         </button>
 
-        <ul className='dropdown-menu'>{entityUpdateTriggerRender()}</ul>
+        <ul className='dropdown-menu'>
+          {entityUpdateTriggerRender()}
+
+          <div className='dropdown-divider'></div>
+
+          {entityDeleteTriggerRender()}
+        </ul>
       </div>
     );
   };

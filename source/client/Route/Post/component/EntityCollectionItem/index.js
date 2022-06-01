@@ -5,23 +5,36 @@ import { useDispatch, useSelector } from 'react-redux';
 
 import {
   entityUpdateSelector,
-  onEntityUpdateCancelHandle
+  entityDeleteSelector,
+  onEntityUpdateCancelHandle,
+  onEntityDeleteCancelHandle
 } from 'client/store/post';
 import EntityDisplay from 'client/Route/Post/component/EntityDisplay';
 import EntityControl from 'client/Route/Post/component/EntityControl';
 import Modal from 'client/Route/component/Modal';
 import EntityUpdate from 'client/Route/Post/component/EntityUpdate';
+import EntityDelete from 'client/Route/Post/component/EntityDelete';
 
 const EntityCollectionItem = (props) => {
   const dispatch = useDispatch();
 
-  const [, , id] = useSelector((state) => {
+  const [ , , entityUpdateId] = useSelector((state) => {
     return entityUpdateSelector(state);
   });
 
+  const [ , , entityDeleteId] = useSelector((state) => {
+    return entityDeleteSelector(state);
+  });
+
   const onModalHideHandle = useCallback(() => {
-    return dispatch(onEntityUpdateCancelHandle());
-  }, [dispatch]);
+    switch (true) {
+      case !!entityUpdateId:
+        return dispatch(onEntityUpdateCancelHandle());
+
+      case !!entityDeleteId:
+        return dispatch(onEntityDeleteCancelHandle());
+    }
+  }, [entityUpdateId, entityDeleteId, dispatch]);
 
   const entityControlRender = () => {
     return (
@@ -46,10 +59,22 @@ const EntityCollectionItem = (props) => {
 
   const entityUpdateRender = () => {
     return (
-      id === props.post.id && (
+      entityUpdateId === props.post.id && (
         <Modal title='edit' onModalHide={onModalHideHandle}>
           <EntityUpdate post={props.post} />
         </Modal>
+      )
+    );
+  };
+
+  const entityDeleteRender = () => {
+    return (
+      entityDeleteId === props.post.id && (
+        <div>
+          <Modal title='delete' onModalHide={onModalHideHandle}>
+            <EntityDelete post={props.post}/>
+          </Modal>
+        </div>
       )
     );
   };
@@ -59,6 +84,7 @@ const EntityCollectionItem = (props) => {
       <div>
         {_entityDisplayRender()}
         {entityUpdateRender()}
+        {entityDeleteRender()}
       </div>
     );
   };

@@ -13,17 +13,21 @@ const Modal = (_props) => {
   }, [onModalHide]);
 
   const renderInitialize = useCallback(() => {
-    BootstrapModal.getOrCreateInstance(ref.current, { backdrop: true }).show();
+    BootstrapModal.getOrCreateInstance(ref.current, {
+      backdrop: true
+    }).toggle();
   }, []);
 
   const focusInitialize = useCallback(() => {
     const $el = $(ref.current).find('.formControl');
 
-    const length = /** @type {any} */ ($el.val()).length;
+    if ($el.length) {
+      const length = /** @type {any} */ ($el.val()).length;
 
-    $el.trigger('focus');
+      $el.trigger('focus');
 
-    /** @type {any} */ ($el[0]).setSelectionRange(length, length);
+      /** @type {any} */ ($el[0]).setSelectionRange(length, length);
+    }
   }, []);
 
   useEffect(() => {
@@ -41,7 +45,11 @@ const Modal = (_props) => {
   }, [renderInitialize, focusInitialize, onModalHideHandle]);
 
   const onModalHideTriggerHandle = () => {
-    return BootstrapModal.getOrCreateInstance(ref.current).hide();
+    try {
+      BootstrapModal.getOrCreateInstance(ref.current).toggle();
+    } catch {
+      $('.modal-backdrop').remove();
+    }
   };
 
   const modalRender = () => {

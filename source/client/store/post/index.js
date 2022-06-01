@@ -36,6 +36,11 @@ const initialState = entityAdapter.getInitialState({
       id: null,
       input: null
     },
+    entityDelete: {
+      loading: false,
+      error: null,
+      id: null
+    },
     entityCollectionGet: {
       loading: false,
       error: null
@@ -85,6 +90,20 @@ export const entityUpdate = createAsyncThunk(
   }
 );
 
+export const entityDelete = createAsyncThunk(
+  'post/delete',
+  /** @type{(any) => any} */
+  (id) => {
+    return window
+      .fetch(`/post/${id}`, {
+        method: 'DELETE'
+      })
+      .then((result) => {
+        return result.json();
+      });
+  }
+);
+
 export const slice = createSlice({
   name: 'post',
   initialState,
@@ -112,6 +131,14 @@ export const slice = createSlice({
     onEntityUpdateInputHandle: (state, action) => {
       state.action.entityUpdate.input[action.payload.key] =
         action.payload.value;
+    },
+    onEntityDeleteTriggerHandle: (state, action) => {
+      state.action.entityDelete.id = action.payload;
+    },
+    onEntityDeleteCancelHandle: (state) => {
+      state.action.entityDelete.id = null;
+
+      state.action.entityDelete.error = null;
     }
   },
   extraReducers: (builder) => {
@@ -145,6 +172,18 @@ export const slice = createSlice({
           ? (state.action.entityUpdate.error = action.payload)
           : entityAdapter.updateOne(state, action.payload);
       })
+      .addCase(entityDelete.pending, (state) => {
+        state.action.entityDelete.loading = true;
+
+        state.action.entityDelete.error = null;
+      })
+      .addCase(entityDelete.fulfilled, (state, action) => {
+        state.action.entityDelete.loading = false;
+
+        action.payload._error
+          ? (state.action.entityDelete.error = action.payload)
+          : entityAdapter.removeOne(state, action.payload.id);
+      })
       .addCase(entityCollectionGet.pending, (state) => {
         state.action.entityCollectionGet.loading = true;
       })
@@ -158,16 +197,18 @@ export const slice = createSlice({
   }
 });
 
-export const entitySelector = entityAdapter.getSelectors((state) => state.post);
-
 export const {
   onEntityCreateInputHandle,
   onEntityUpdateTriggerHandle,
   onEntityUpdateCancelHandle,
-  onEntityUpdateInputHandle
+  onEntityUpdateInputHandle,
+  onEntityDeleteTriggerHandle,
+  onEntityDeleteCancelHandle
 } = slice.actions;
 
 export default slice.reducer;
+
+export const entitySelector = entityAdapter.getSelectors((state) => state.post);
 
 export const entityCreateSelector = (state) => {
   const { loading, error, input } = state.post.action.entityCreate;
@@ -179,6 +220,12 @@ export const entityUpdateSelector = (state) => {
   const { loading, error, id, input } = state.post.action.entityUpdate;
 
   return [loading, error, id, input];
+};
+
+export const entityDeleteSelector = (state) => {
+  const { loading, error, id } = state.post.action.entityDelete;
+
+  return [loading, error, id];
 };
 
 export const entityCollectionGetSelector = (state) => {
