@@ -43,7 +43,7 @@ const EntityDelete = (props) => {
         <div className='mb-3'>are you sure?</div>
 
         <div className='d-flex justify-content-end btnGroup'>
-          <button type='submit' className='btn btn-outline-primary'>
+          <button type='submit' className='d-flex btn btn-outline-primary'>
             {loadingInlineRender()}
             yes
           </button>
